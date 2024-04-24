@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'user_authentication'
+    'web_user'
 ]
 
 MIDDLEWARE = [
@@ -54,6 +54,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mini_camp.urls'
+
 
 TEMPLATES = [
     {
@@ -130,3 +131,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:5173"
 ]
+
+
+#AUTH_USER_MODEL = 'web_user.Custom_User'
