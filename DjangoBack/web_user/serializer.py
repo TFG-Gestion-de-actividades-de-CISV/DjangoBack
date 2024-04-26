@@ -5,7 +5,7 @@ from .models import Web_User_Pending, Profile
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['name', 'surname', 'second_surname', 'city', 'postal_code', 'phone', 'birthdate']
+        fields = '__all__'
 
 
 class Web_User_Pending_Serializer(serializers.ModelSerializer):
