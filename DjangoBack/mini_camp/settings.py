@@ -39,8 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     'web_user'
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -133,4 +136,4 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-#AUTH_USER_MODEL = 'web_user.Custom_User'
+AUTH_USER_MODEL = 'web_user.User'
