@@ -38,9 +38,6 @@ def login(request):
 @authentication_classes([CookieTokenAuthentication])
 def registration_requests(request):
 
-    print(request.COOKIES)
-    print(request.user)
-
     if not request.user.is_authenticated:
         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
     user = request.user
@@ -53,3 +50,25 @@ def registration_requests(request):
     serializer = Web_User_NoPassword_Serializer(regist_requests, many = True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@authentication_classes([CookieTokenAuthentication])
+def reject_request(request):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    user = request.user
+    
+    if not user.is_admin:
+        return Response({"error": "No es admin"}, status= status.HTTP_403_FORBIDDEN)
+    
+    email = request.data["email"]
+    print(request.data["reason"])
+    try:
+        web_user_pending = Web_User_Pending.objects.get(email = email)
+        web_user_pending.delete()
+        return Response({'status': 'success'},status=status.HTTP_200_OK)
+    except Web_User_Pending.DoesNotExist:
+        return Response({"error": "Peticion no existe"},status=status.HTTP_404_NOT_FOUND)
+
