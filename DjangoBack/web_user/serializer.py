@@ -21,3 +21,10 @@ class Web_User_Pending_Serializer(serializers.ModelSerializer):
         web_user_pending = Web_User_Pending.objects.create(profile=profile, **validated_data)
         return web_user_pending
 
+
+class Web_User_NoPassword_Serializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = Web_User_Pending
+        fields = ['email' , 'profile']
