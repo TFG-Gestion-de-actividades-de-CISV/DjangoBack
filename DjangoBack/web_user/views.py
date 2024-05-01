@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from .models import User, Web_User_Pending, Profile
 from django.http import JsonResponse
 from .authentication import CookieTokenAuthentication
+from django.contrib.auth.hashers import check_password
+
 
 
 
@@ -116,3 +118,20 @@ def acept_request(request):
     except Web_User_Pending.DoesNotExist:
         return Response({"error": "Peticion no existe"},status=status.HTTP_404_NOT_FOUND)
 
+
+
+@api_view(["POST"])
+def change_password(request):
+    #user = get_object_or_404(User, email=request.data["email"])
+    
+    user = User.objects.filter(email=request.data["email"]).first()
+
+    if not user:
+        return Response({"error": "Usaurio con este email no existe"}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not check_password(request.data["password_old"],user.password):
+        return Response({"error": "Contraseña actual incorrecta"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.set_password(request.data["password_new"])
+    user.save()
+    return Response({'status': 'success'}, status=status.HTTP_200_OK)
