@@ -122,7 +122,6 @@ def acept_request(request):
 
 @api_view(["POST"])
 def change_password(request):
-    #user = get_object_or_404(User, email=request.data["email"])
     
     user = User.objects.filter(email=request.data["email"]).first()
 
