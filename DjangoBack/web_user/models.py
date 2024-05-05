@@ -15,7 +15,7 @@ class Profile(models.Model):
 
 # Usuario pendiente de aceptación de admin
 class Web_User_Pending(models.Model):
-    email = models.EmailField(max_length=254, unique=True)
+    email = models.EmailField(max_length=254, unique=True, error_messages={"unique": "El email ya está en uso."})
     password = models.CharField(max_length=254)
     is_admin = models.BooleanField(default=False)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE,null=True, blank=True)
