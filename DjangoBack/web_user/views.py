@@ -18,14 +18,14 @@ def register(request):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.errors ,status=status.HTTP_201_CREATED, )
-    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    return Response({"Error": serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def login(request):
     user = get_object_or_404(User, email=request.data["email"])
     
     if not user.check_password(request.data["password"]):
-        return JsonResponse({"error" : "Invalif password"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({"error" : "Invalid password"}, status=status.HTTP_404_NOT_FOUND)
     
     token, created = Token.objects.get_or_create(user=user)
     is_admin = user.is_admin
