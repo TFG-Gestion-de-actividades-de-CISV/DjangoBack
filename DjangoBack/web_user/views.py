@@ -32,9 +32,21 @@ def login(request):
     response = JsonResponse({"is_admin": is_admin})
     #Guarda token en las cookies
     response.set_cookie("token", token.key, httponly=True, samesite=None,secure=True)
-    print(response.cookies)
 
     return response
+
+
+
+@api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
+def logout(request):
+    #Elimina token de BD
+    request.user.auth_token.delete()
+
+    response = Response({"message": "Logout exitoso"}, status=status.HTTP_200_OK)
+    response.delete_cookie("token")
+    return response
+
 
 @api_view(['GET'])
 @authentication_classes([CookieTokenAuthentication])
@@ -134,3 +146,5 @@ def change_password(request):
     user.set_password(request.data["password_new"])
     user.save()
     return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+
