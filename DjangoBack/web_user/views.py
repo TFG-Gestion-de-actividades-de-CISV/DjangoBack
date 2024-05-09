@@ -14,6 +14,14 @@ from django.contrib.auth.hashers import check_password
 
 @api_view(['POST'])
 def register(request):
+    if not User.objects.exists():
+        user_data = request.data
+        user_data["is_admin"] = True
+        user_serializer = Web_User_Pending_Serializer(data=user_data)
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
+        
     serializer = Web_User_Pending_Serializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
