@@ -26,13 +26,29 @@ class Web_User_Pending_Serializer(serializers.ModelSerializer):
         model = Web_User_Pending
         fields = ['email', 'password', 'is_admin', 'profile']
 
-        
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("El usuario con este email ya existe")
 
+        
     def create(self, validated_data):
         profile_data = validated_data.pop("profile")
         profile = Profile.objects.create(**profile_data)
         web_user_pending = Web_User_Pending.objects.create(profile=profile, **validated_data)
         return web_user_pending
+    
+class User_Serializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'is_admin', 'profile']
+        
+    def create(self, validated_data):
+        profile_data = validated_data.pop("profile")
+        profile = Profile.objects.create(**profile_data)
+        user = User.objects.create(profile=profile, **validated_data)
+        return user
 
 
 class Web_User_NoPassword_Serializer(serializers.ModelSerializer):

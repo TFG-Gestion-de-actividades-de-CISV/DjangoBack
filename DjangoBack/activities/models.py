@@ -4,14 +4,14 @@ from django.db import models
 
 
 class Activity(models.Model):
-    name = models.CharField(max_length=254, null=True)
-    adress = models.CharField(max_length=254, null=True)
-    date_start = models.DateField(null=True)
-    date_end = models.DateField(null=True)
-    hours_start = models.CharField(max_length=254, null=True)
-    price = models.CharField(max_length=254, null=True)
-    packing_list = models.CharField(max_length=1023, null=True)
-    family_reunion = models.CharField(max_length=1023, null=True)
+    name = models.CharField(max_length=254)
+    adress = models.CharField(max_length=254)
+    date_start = models.DateField()
+    date_end = models.DateField()
+    hours_start = models.CharField(max_length=254)
+    price = models.CharField(max_length=254)
+    packing_list = models.TextField()
+    family_reunion = models.TextField()
 
     
 
