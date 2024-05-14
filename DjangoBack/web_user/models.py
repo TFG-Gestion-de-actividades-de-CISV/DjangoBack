@@ -4,13 +4,12 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Profile(models.Model):
-    name = models.CharField(max_length=254, null=True)
-    surname = models.CharField(max_length=254, null=True)
-    second_surname = models.CharField(max_length=254, null=True)
-    city = models.CharField(max_length=254, null=True)
-    postal_code = models.CharField(max_length=20, null=True)
-    phone = models.CharField(max_length=20, null=True)
-    birthdate = models.DateField(null=True)
+    name = models.CharField(max_length=254)
+    surnames = models.CharField(max_length=254)
+    city = models.CharField(max_length=254)
+    postal_code = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20)
+    birthdate = models.DateField()
     
 
 # Usuario pendiente de aceptación de admin
@@ -18,7 +17,7 @@ class Web_User_Pending(models.Model):
     email = models.EmailField(max_length=254, unique=True, error_messages={"unique": "El email ya está en uso."})
     password = models.CharField(max_length=254)
     is_admin = models.BooleanField(default=False)
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,null=True, blank=True)
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.email
