@@ -12,6 +12,15 @@ from .models import Activity
 @api_view(["POST"])
 @authentication_classes([CookieTokenAuthentication])
 def create_activity(request):
+
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+    if not request.user.is_admin:
+        return Response({"error": "No es admin"}, status= status.HTTP_403_FORBIDDEN)
+
+
+
     serializer = ActivitySerializer(data=request.data)
 
     if serializer.is_valid():
@@ -26,13 +35,7 @@ def all_activities(request):
 
     if not request.user.is_authenticated:
         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
-    user = request.user
     
-    if not user.is_admin:
-        return Response({"error": "No es admin"}, status= status.HTTP_403_FORBIDDEN)
-
-
-
     activities = Activity.objects.all()
 
     serializer = ActivitySerializer(activities, many = True)

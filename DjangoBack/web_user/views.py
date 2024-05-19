@@ -1,13 +1,14 @@
 from rest_framework.response import Response 
 from rest_framework.authtoken.models import Token
-from .serializer import Web_User_Pending_Serializer, Web_User_NoPassword_Serializer
+from .serializer import Web_User_Pending_Serializer, Web_User_NoPassword_Serializer, User_Serializer
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import User, Web_User_Pending, Profile
 from django.http import JsonResponse
 from .authentication import CookieTokenAuthentication
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
+
 
 
 
@@ -15,11 +16,15 @@ from django.contrib.auth.hashers import check_password
 @api_view(['POST'])
 def register(request):
     if not User.objects.exists():
+        print("entra")
         user_data = request.data
         user_data["is_admin"] = True
-        user_serializer = Web_User_Pending_Serializer(data=user_data)
+        user_serializer = User_Serializer(data=user_data)
         if user_serializer.is_valid():
-            user_serializer.save()
+            password = user_data.pop("password")
+            user = user_serializer.save()
+            user.set_password(password)
+            user.save()
             return Response(user_serializer.data, status=status.HTTP_201_CREATED)
         
     serializer = Web_User_Pending_Serializer(data=request.data)
@@ -114,8 +119,7 @@ def acept_request(request):
 
         new_profile = Profile.objects.create(
             name=web_user_pending.profile.name,
-            surname=web_user_pending.profile.surname,
-            second_surname=web_user_pending.profile.second_surname,
+            surnames=web_user_pending.profile.surnames,
             city=web_user_pending.profile.city,
             postal_code=web_user_pending.profile.postal_code,
             phone=web_user_pending.profile.phone,
@@ -132,7 +136,6 @@ def acept_request(request):
         new_user.password = web_user_pending.password
         new_user.save()
 
-        web_user_pending.profile.delete()
         web_user_pending.delete()
         return Response({'status': 'success'},status=status.HTTP_201_CREATED)
     except Web_User_Pending.DoesNotExist:
