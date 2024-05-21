@@ -44,7 +44,7 @@ def login(request):
     is_admin = user.is_admin
     response = JsonResponse({"is_admin": is_admin})
     #Guarda token en las cookies
-    response.set_cookie("token", token.key, httponly=True, samesite=None,secure=True)
+    response.set_cookie("token", token.key, httponly=True,  samesite='Lax')
 
     return response
 
