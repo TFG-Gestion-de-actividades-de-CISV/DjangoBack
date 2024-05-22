@@ -1,10 +1,10 @@
 from django.forms import ValidationError
 from rest_framework.response import Response 
 from rest_framework.decorators import api_view, authentication_classes
-from .serializer import ActivitySerializer, NinosSerializer, NinosGetSerializer
+from .serializer import ActivitySerializer, NinosSerializer, NinosGetSerializer, MayoresGetSerializer, MayoresSerializer
 from rest_framework import status
 from web_user.authentication import CookieTokenAuthentication
-from .models import Activity, InscriptionBase, Ninos
+from .models import Activity, Ninos, Mayores
 
 
 
@@ -70,11 +70,13 @@ def ninos_inscription(request):
     
 
 serializers_dict = {
-    'ninos': NinosGetSerializer
+    'ninos': NinosGetSerializer,
+    'mayores': MayoresGetSerializer
 }
 
 models_dict = {
-    'ninos': Ninos
+    'ninos': Ninos,
+    'mayores': Mayores
 }
 
 @api_view(["GET"])
@@ -103,6 +105,31 @@ def get_or_create_inscription(request, role):
             return Response({"error": "Rol no válido"}, status=status.HTTP_400_BAD_REQUEST)
     
     else:
-        Response({}, status=status.HTTP_200_OK)
+        return Response({}, status=status.HTTP_200_OK)
 
    
+
+
+@api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
+def mayores_inscription(request):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+    data = request.data
+    data["user"] = request.user.id
+    data["rol"] = "mayores"
+
+    serializer = MayoresSerializer(data=data)
+    
+    if serializer.is_valid():
+        try:
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
