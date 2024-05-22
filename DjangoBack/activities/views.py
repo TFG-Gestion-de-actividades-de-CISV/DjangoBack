@@ -90,7 +90,7 @@ def get_or_create_inscription(request, role):
 
     model_class = models_dict.get(role)
     if not model_class:
-        return Response({"errro", "Rol no válido"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error", "Rol no válido"}, status=status.HTTP_400_BAD_REQUEST)
     
     inscription = model_class.objects.filter(user=user).first()
 
