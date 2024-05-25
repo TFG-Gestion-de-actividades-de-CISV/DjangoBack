@@ -29,7 +29,7 @@ class Web_User_Pending_Serializer(serializers.ModelSerializer):
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("El usuario con este email ya existe")
-
+        return value
         
     def create(self, validated_data):
         profile_data = validated_data.pop("profile")

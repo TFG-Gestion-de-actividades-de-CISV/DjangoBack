@@ -15,9 +15,11 @@ from django.contrib.auth.hashers import check_password, make_password
 
 @api_view(['POST'])
 def register(request):
+        
+    user_data = request.data
+
+    # Si no hay usuarios en el sistema, crear el primer usuario como administrador
     if not User.objects.exists():
-        print("entra")
-        user_data = request.data
         user_data["is_admin"] = True
         user_serializer = User_Serializer(data=user_data)
         if user_serializer.is_valid():
@@ -26,11 +28,14 @@ def register(request):
             user.set_password(password)
             user.save()
             return Response(user_serializer.data, status=status.HTTP_201_CREATED)
-        
+        else:
+            return Response({"Error": user_serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+     
+    # Si ya hay usuarios en el sistema, crear una solicitud pendiente
     serializer = Web_User_Pending_Serializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.errors ,status=status.HTTP_201_CREATED, )
+        return Response(serializer.data ,status=status.HTTP_201_CREATED, )
     return Response({"Error": serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -54,6 +59,11 @@ def login(request):
 @authentication_classes([CookieTokenAuthentication])
 def logout(request):
     #Elimina token de BD
+
+    if not request.user.is_authenticated:
+        return Response({"error": "Usuario no autenticado"}, status=status.HTTP_403_FORBIDDEN)
+
+
     request.user.auth_token.delete()
 
     response = Response({"message": "Logout exitoso"}, status=status.HTTP_200_OK)
@@ -128,7 +138,6 @@ def acept_request(request):
 
         #Creamos nuevo user
         new_user = User.objects.create_user(
-            username = email,
             email = email,
             profile = new_profile,
             password = None
