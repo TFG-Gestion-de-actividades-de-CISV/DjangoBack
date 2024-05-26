@@ -40,10 +40,10 @@ class Participantes(InscriptionBase):
     #pago
 
 
-class Ninos(Participantes):
+class Nino(Participantes):
     pass
 
-class Mayores(Participantes):
+class Mayor(Participantes):
     pass
 
 class Colaborador(InscriptionBase):

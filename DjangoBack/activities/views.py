@@ -1,10 +1,10 @@
 from django.forms import ValidationError
 from rest_framework.response import Response 
 from rest_framework.decorators import api_view, authentication_classes
-from .serializer import ActivitySerializer, NinosSerializer, NinosGetSerializer, MayoresGetSerializer, MayoresSerializer
+from .serializer import ActivitySerializer, NinosSerializer, NinosGetSerializer, MayoresGetSerializer, MayoresSerializer, LiderSerializer, LiderGetSerializer, MonitorSerializer, MonitorGetSerializer 
 from rest_framework import status
 from web_user.authentication import CookieTokenAuthentication
-from .models import Activity, Ninos, Mayores
+from .models import Activity, Nino, Mayor, Monitor, Lider
 
 
 
@@ -66,17 +66,21 @@ def ninos_inscription(request):
         except ValidationError as e:
             return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
 
 serializers_dict = {
     'ninos': NinosGetSerializer,
-    'mayores': MayoresGetSerializer
+    'mayores': MayoresGetSerializer,
+    'lider': LiderGetSerializer,
+    'monitor': MonitorGetSerializer
 }
 
 models_dict = {
-    'ninos': Ninos,
-    'mayores': Mayores
+    'ninos': Nino,
+    'mayores': Mayor,
+    'lider': Lider,
+    'monitor': Monitor
 }
 
 @api_view(["GET"])
@@ -132,4 +136,57 @@ def mayores_inscription(request):
         except ValidationError as e:
             return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+@api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
+def lider_inscription(request):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+    data = request.data
+    data["user"] = request.user.id
+    data["rol"] = "lider"
+
+    serializer = LiderSerializer(data=data)
+    
+    if serializer.is_valid():
+        try:
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
+def monitor_inscription(request):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+    data = request.data
+    data["user"] = request.user.id
+    data["rol"] = "monitor"
+
+    serializer = MonitorSerializer(data=data)
+    
+    if serializer.is_valid():
+        try:
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
