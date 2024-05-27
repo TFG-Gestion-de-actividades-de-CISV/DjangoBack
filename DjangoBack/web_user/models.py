@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
+from .managers import CustomUserManager
 
 
 class Profile(models.Model):
@@ -29,8 +30,14 @@ class Web_User_Pending(models.Model):
 
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True)
     is_admin = models.BooleanField(default=False)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE,null=True, blank=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
         self.username=self.email
