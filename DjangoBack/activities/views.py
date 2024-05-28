@@ -1,10 +1,10 @@
 from django.forms import ValidationError
 from rest_framework.response import Response 
 from rest_framework.decorators import api_view, authentication_classes
-from .serializer import ActivitySerializer, NinosSerializer, NinosGetSerializer, MayoresGetSerializer, MayoresSerializer, LiderSerializer, LiderGetSerializer, MonitorSerializer, MonitorGetSerializer 
+from .serializer import *
 from rest_framework import status
 from web_user.authentication import CookieTokenAuthentication
-from .models import Activity, Nino, Mayor, Monitor, Lider
+from .models import *
 
 
 
@@ -48,13 +48,25 @@ def all_activities(request):
 @authentication_classes([CookieTokenAuthentication])
 def ninos_inscription(request):
     
+
     if not request.user.is_authenticated:
         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
     
+    health_card = request.FILES.get('health_card')
+    pago = request.FILES.get('pago')
 
-    data = request.data
+    if health_card is None or pago is None:
+        return Response({"error": "Se requieren los archivos de health_card y pago."}, status=status.HTTP_400_BAD_REQUEST)
+
+    data = request.data.copy()
     data["user"] = request.user.id
     data["rol"] = "ninos"
+
+    health_card_instance = Document.objects.create(upload=health_card)
+    pago_instance = Document.objects.create(upload=pago)
+
+    data["health_card"] = health_card_instance.id
+    data["pago"] = pago_instance.id
 
     serializer = NinosSerializer(data=data)
     

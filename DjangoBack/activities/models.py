@@ -3,7 +3,9 @@ from django.forms import ValidationError
 from web_user.models import User
 
 # Create your models here.
-
+class Document(models.Model):
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    upload = models.FileField()
 
 class Activity(models.Model):
     name = models.CharField(max_length=254)
@@ -32,12 +34,16 @@ class InscriptionBase(models.Model):
             raise ValidationError("Ya existe una inscripción para este usuario y actividad.")
 
 class Participantes(InscriptionBase):
-    # health_card = models.CharField(max_length=255, blank=True, null=True)
+    health_card = models.ForeignKey(Document, on_delete=models.CASCADE, 
+                                    related_name='health_card',
+                                      null=True, blank=True)
     cisv_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
     medicines = models.TextField()
-    #pago
+    pago = models.ForeignKey(Document, on_delete=models.CASCADE, 
+                                    related_name='pago',
+                                      null=True, blank=True)
 
 
 class Nino(Participantes):

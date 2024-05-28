@@ -1,5 +1,5 @@
 from rest_framework import	serializers
-from .models import Activity, Nino, Mayor, Lider, Monitor
+from .models import *
 import re
 
 
@@ -9,13 +9,21 @@ class ActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = '__all__'
 
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = "__all__"
 
 class NinosSerializer(serializers.ModelSerializer):
+    health_card = DocumentSerializer(read_only=True)
+    pago = DocumentSerializer(read_only=True)
+
     class Meta:
         model= Nino
         fields = ["user", "activity", "rol", "allergy",
             'cisv_authorization', 'emergency_phone',
-            't_shirt_size', 'medicines']
+            't_shirt_size', 'medicines', 'health_card',
+            'pago']
         
 
     def validate_emergency_phone(self, value):
