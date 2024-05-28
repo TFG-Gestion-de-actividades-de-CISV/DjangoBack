@@ -1,6 +1,6 @@
 from rest_framework.response import Response 
 from rest_framework.authtoken.models import Token
-from .serializer import Web_User_Pending_Serializer, Web_User_NoPassword_Serializer, User_Serializer
+from .serializer import *
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -167,4 +167,36 @@ def change_password(request):
     user.save()
     return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
+
+@api_view(["GET"])
+@authentication_classes([CookieTokenAuthentication])
+def info_profile(request):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    user = request.user
+    
+    profile = user.profile
+    serializer = User_Profile_Serializer(profile)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+@api_view(["PUT"])
+@authentication_classes([CookieTokenAuthentication])
+def update_profile(request):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+    user = request.user
+    profile = user.profile
+
+    serializer = User_Profile_Update_Serializer(profile, data = request.data, partial = True)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'status': 'success'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
