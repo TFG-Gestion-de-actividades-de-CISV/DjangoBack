@@ -57,3 +57,15 @@ class Web_User_NoPassword_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Web_User_Pending
         fields = ['email' , 'profile']
+
+
+class User_Profile_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+class User_Profile_Update_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+        read_only_fields = ('id',)
