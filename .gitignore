@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 
 
-
 # ignorar carpeta media
 media/
+
+erd.dot
