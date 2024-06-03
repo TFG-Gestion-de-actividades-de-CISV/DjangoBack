@@ -11,28 +11,29 @@ class Profile(models.Model):
     postal_code = models.CharField(max_length=20)
     phone = models.CharField(max_length=20)
     birthdate = models.DateField()
-    
+
 
 # Usuario pendiente de aceptación de admin
 class Web_User_Pending(models.Model):
-    email = models.EmailField(max_length=254, unique=True, error_messages={"unique": "El email ya está en uso."})
+    email = models.EmailField(max_length=254, unique=True, error_messages={
+                              "unique": "El email ya está en uso."})
     password = models.CharField(max_length=254)
     is_admin = models.BooleanField(default=False)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.email
-    
-    def save(self, *args, **kwargs):
-        self.password =make_password(self.password)
-        super().save(*args, **kwargs)
 
+    def save(self, *args, **kwargs):
+        self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_admin = models.BooleanField(default=False)
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,null=True, blank=True)
+    profile = models.OneToOneField(
+        Profile, on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -40,5 +41,5 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
-        self.username=self.email
+        self.username = self.email
         super().save(*args, **kwargs)
