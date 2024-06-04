@@ -45,7 +45,7 @@ class Participantes(InscriptionBase):
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,
                                     related_name='health_card',
                                     null=True, blank=True)
-    cisv_authorization = models.BooleanField(default=False)
+    image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
     medicines = models.TextField()
@@ -83,7 +83,7 @@ class Lider(Colaborador):
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,
                                     related_name='lider_health_card',
                                     null=True, blank=True)
-    cisv_authorization = models.BooleanField(default=False)
+    image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
     medicines = models.TextField()
@@ -96,7 +96,7 @@ class Monitor(Colaborador):
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,
                                     related_name='monitor_health_card',
                                     null=True, blank=True)
-    cisv_authorization = models.BooleanField(default=False)
+    image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
     medicines = models.TextField()

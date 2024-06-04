@@ -23,7 +23,7 @@ class NinosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Nino
         fields = ["user", "activity", "rol", "allergy",
-                  'cisv_authorization', 'emergency_phone',
+                  'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines', 'health_card',
                   'pago']
 
@@ -44,7 +44,7 @@ class NinosGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Nino
-        fields = ["allergy", 'cisv_authorization', 'emergency_phone',
+        fields = ["allergy", 'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines', 'health_card',
                   'pago']
 
@@ -67,7 +67,7 @@ class MayoresSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mayor
         fields = ["user", "activity", "rol", "allergy",
-                  'cisv_authorization', 'emergency_phone',
+                  'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines',
                   'health_card', 'pago']
 
@@ -88,7 +88,7 @@ class MayoresGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Mayor
-        fields = ["allergy", 'cisv_authorization', 'emergency_phone',
+        fields = ["allergy", 'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines', 'health_card', 'pago']
 
     def get_health_card(self, obj):
@@ -116,7 +116,7 @@ class LiderSerializer(serializers.ModelSerializer):
         model = Lider
         fields = ["user", "activity", "rol", "dni", "allergy",
                   "profession", "languages", "first_aid",
-                  "cisv_authorization", "emergency_phone",
+                  "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
                   "cisv_safeguarding", "health_card"]
@@ -142,7 +142,7 @@ class LiderGetSerializer(serializers.ModelSerializer):
         model = Lider
         fields = ["dni",
                   "profession", "languages", "first_aid", "allergy",
-                  "cisv_authorization", "emergency_phone",
+                  "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
                   "cisv_safeguarding", "health_card"]
@@ -184,7 +184,7 @@ class MonitorSerializer(serializers.ModelSerializer):
         model = Monitor
         fields = ["user", "activity", "rol",  "allergy",
                   "dni", "languages",
-                  "cisv_authorization", "emergency_phone",
+                  "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines", "sexual_crimes_certificate",
                   "criminal_offenses_certificate", "cisv_safeguarding", "health_card", "pago"]
 
@@ -209,7 +209,7 @@ class MonitorGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Monitor
         fields = ["dni", "languages", "allergy",
-                  "cisv_authorization", "emergency_phone",
+                  "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
                   "cisv_safeguarding", "health_card", "pago"]
