@@ -25,10 +25,13 @@ class Activity(models.Model):
 
 
 class InscriptionBase(models.Model):
+
+    STATUS_CHOICES = ((0, "Pendiente"), (1,"Aceptado"), (2, "Rechazado"))
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     rol = models.CharField(max_length=20)
     allergy = models.TextField(blank=True, null=True)
+    status = models.SmallIntegerField(choices=STATUS_CHOICES, blank=True, null=True)
 
     class Meta:
         unique_together = ("user", "activity")

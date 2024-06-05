@@ -53,6 +53,7 @@ def ninos_inscription(request):
     data = request.data.copy()
     data["user"] = request.user.id
     data["rol"] = "ninos"
+    data["status"] = 0
 
     if health_card is None:
         last_inscription = Nino.objects.filter(
@@ -139,6 +140,8 @@ def mayores_inscription(request):
     data = request.data
     data["user"] = request.user.id
     data["rol"] = "mayores"
+    data["status"] = 0
+
 
     if health_card is None:
         last_inscription = Mayor.objects.filter(
@@ -185,6 +188,8 @@ def lider_inscription(request):
     data = request.data
     data["user"] = request.user.id
     data["rol"] = "lider"
+    data["status"] = 0
+
 
     if health_card is None:
         last_inscription = Lider.objects.filter(
@@ -250,6 +255,8 @@ def monitor_inscription(request):
     data = request.data
     data["user"] = request.user.id
     data["rol"] = "monitor"
+    data["status"] = 0
+
 
     if health_card is None:
         last_inscription = Monitor.objects.filter(
@@ -305,3 +312,68 @@ def monitor_inscription(request):
             return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@authentication_classes([CookieTokenAuthentication])
+def all_inscriptions(request, activity):
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    user = request.user
+
+    if not user.is_admin:
+        return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
+    
+    inscription = InscriptionBase.objects.filter(activity = activity)
+    serializer = InscripcionSerializer(inscription, many = True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+inscriptions_dict = {
+    'ninos': AllNinosFieldsSerializer,
+    'mayores': AllMayoresFieldsSerializer,
+    'lider': AllLiderFieldsSerializer,
+    'monitor': AllMonitorFieldsSerializer
+}
+
+models_dict = {
+    'ninos': Nino,
+    'mayores': Mayor,
+    'lider': Lider,
+    'monitor': Monitor
+}
+
+
+@api_view(["GET"])
+@authentication_classes([CookieTokenAuthentication])
+def get_inscription(request, activity, user_email, role):
+
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    if not request.user.is_admin:
+        return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
+    
+    user = User.objects.get(email = user_email)
+
+    model_class = models_dict.get(role)
+    if not model_class:
+        return Response({"error": "Rol no válido"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    activity_instance = Activity.objects.get(id = activity)
+
+    inscription = model_class.objects.get(user=user, activity = activity_instance)
+
+
+    if inscription:
+        serializer_class = inscriptions_dict.get(role)
+        if serializer_class:
+            serializer = serializer_class(
+                inscription, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Rol no válido"}, status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)

@@ -25,7 +25,7 @@ class NinosSerializer(serializers.ModelSerializer):
         fields = ["user", "activity", "rol", "allergy",
                   'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines', 'health_card',
-                  'pago']
+                  'pago', 'status']
 
     def validate_emergency_phone(self, value):
         if not re.match(r'^\+?[0-9]+$', value):
@@ -69,7 +69,7 @@ class MayoresSerializer(serializers.ModelSerializer):
         fields = ["user", "activity", "rol", "allergy",
                   'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines',
-                  'health_card', 'pago']
+                  'health_card', 'pago', 'status']
 
     def validate_emergency_phone(self, value):
         if not re.match(r'^\+?[0-9]+$', value):
@@ -119,7 +119,7 @@ class LiderSerializer(serializers.ModelSerializer):
                   "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
-                  "cisv_safeguarding", "health_card"]
+                  "cisv_safeguarding", "health_card", 'status']
 
     def validate_emergency_phone(self, value):
         if not re.match(r'^\+?[0-9]+$', value):
@@ -185,7 +185,7 @@ class MonitorSerializer(serializers.ModelSerializer):
         fields = ["user", "activity", "rol",  "allergy",
                   "dni", "languages",
                   "image_authorization", "emergency_phone",
-                  "t_shirt_size", "medicines", "sexual_crimes_certificate",
+                  "t_shirt_size", "medicines", "sexual_crimes_certificate", 'status',
                   "criminal_offenses_certificate", "cisv_safeguarding", "health_card", "pago"]
 
     def validate_emergency_phone(self, value):
@@ -238,3 +238,87 @@ class MonitorGetSerializer(serializers.ModelSerializer):
         if obj.pago:
             return self.context['request'].build_absolute_uri(obj.pago.upload.url)
         return None
+
+
+class InscripcionSerializer(serializers.ModelSerializer):
+    
+    user_name = serializers.SerializerMethodField()
+    user_surnames = serializers.SerializerMethodField()
+    user_email = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = InscriptionBase
+        fields = ["rol", "status", "user_name", "user_surnames", "id", "user_email"]
+    
+    def get_user_name(self, obj):
+        return obj.user.profile.name if obj.user.profile else None
+    
+    def get_user_email(self, obj):
+        return obj.user.email if obj.user.email else None
+    
+    
+    def get_user_surnames(self, obj):
+        return obj.user.profile.surnames if obj.user.profile else None
+    
+    def get_status(self, obj):
+        return obj.get_status_display()
+    
+
+class AllNinosFieldsSerializer(NinosGetSerializer):
+
+    user_name = serializers.CharField(source='user.profile.name', read_only=True)
+    user_surnames = serializers.CharField(source='user.profile.surnames', read_only=True)
+    user_city = serializers.CharField(source='user.profile.city', read_only=True)
+    user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
+    user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
+    user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    class Meta:
+        model = Nino
+        fields = NinosGetSerializer.Meta.fields + ["user_name", "user_surnames",
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+
+    
+
+class AllMayoresFieldsSerializer(MayoresGetSerializer):
+    
+    user_name = serializers.CharField(source='user.profile.name', read_only=True)
+    user_surnames = serializers.CharField(source='user.profile.surnames', read_only=True)
+    user_city = serializers.CharField(source='user.profile.city', read_only=True)
+    user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
+    user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
+    user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    class Meta:
+        model = Mayor
+        fields = MayoresGetSerializer.Meta.fields + ["user_name", "user_surnames",
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+
+    
+class AllLiderFieldsSerializer(LiderGetSerializer):
+    
+    user_name = serializers.CharField(source='user.profile.name', read_only=True)
+    user_surnames = serializers.CharField(source='user.profile.surnames', read_only=True)
+    user_city = serializers.CharField(source='user.profile.city', read_only=True)
+    user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
+    user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
+    user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    class Meta:
+        model = Lider
+        fields = LiderGetSerializer.Meta.fields + ["user_name", "user_surnames",
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+
+    
+class AllMonitorFieldsSerializer(MonitorGetSerializer):
+    
+    user_name = serializers.CharField(source='user.profile.name', read_only=True)
+    user_surnames = serializers.CharField(source='user.profile.surnames', read_only=True)
+    user_city = serializers.CharField(source='user.profile.city', read_only=True)
+    user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
+    user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
+    user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    class Meta:
+        model = Monitor 
+        fields = MonitorGetSerializer.Meta.fields + ["user_name", "user_surnames",
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+
+    
