@@ -9,9 +9,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_postal_code(self, value):
-        if not value.isdigit():
+        if not value.isdigit() or len(value) != 5:
             raise serializers.ValidationError(
-                "El código postal solo puede contener números.")
+                "El código postal debe contener 5 números.")
         return value
 
     def validate_phone(self, value):
