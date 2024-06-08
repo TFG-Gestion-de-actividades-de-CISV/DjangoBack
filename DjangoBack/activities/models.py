@@ -31,7 +31,7 @@ class InscriptionBase(models.Model):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     rol = models.CharField(max_length=20)
     allergy = models.TextField(blank=True, null=True)
-    status = models.SmallIntegerField(choices=STATUS_CHOICES, blank=True, null=True)
+    status = models.SmallIntegerField(choices=STATUS_CHOICES)
 
     class Meta:
         unique_together = ("user", "activity")
@@ -46,15 +46,13 @@ class InscriptionBase(models.Model):
 
 class Participantes(InscriptionBase):
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                    related_name='health_card',
-                                    null=True, blank=True)
+                                    related_name='health_card')
     image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
-    t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
+    t_shirt_size = models.CharField(max_length=10)
     medicines = models.TextField()
     pago = models.ForeignKey(Document, on_delete=models.CASCADE,
-                             related_name='pago',
-                             null=True, blank=True)
+                             related_name='pago')
 
 
 class Nino(Participantes):
@@ -67,14 +65,11 @@ class Mayor(Participantes):
 
 class Colaborador(InscriptionBase):
     sexual_crimes_certificate = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                                  related_name='sexual_crimes_certificate',
-                                                  null=True, blank=True)
+                                                  related_name='sexual_crimes_certificate')
     criminal_offenses_certificate = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                                      related_name='criminal_offenses_certificate',
-                                                      null=True, blank=True)
+                                                      related_name='criminal_offenses_certificate')
     cisv_safeguarding = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                          related_name='cisv_safeguarding',
-                                          null=True, blank=True)
+                                          related_name='cisv_safeguarding')
 
 
 class Lider(Colaborador):
@@ -84,11 +79,10 @@ class Lider(Colaborador):
     first_aid = models.BooleanField(default=False)
 
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                    related_name='lider_health_card',
-                                    null=True, blank=True)
+                                    related_name='lider_health_card')
     image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
-    t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
+    t_shirt_size = models.CharField(max_length=10)
     medicines = models.TextField()
 
 
@@ -97,12 +91,10 @@ class Monitor(Colaborador):
     languages = models.CharField(max_length=100)
 
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                    related_name='monitor_health_card',
-                                    null=True, blank=True)
+                                    related_name='monitor_health_card')
     image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
-    t_shirt_size = models.CharField(max_length=10, blank=True, null=True)
+    t_shirt_size = models.CharField(max_length=10)
     medicines = models.TextField()
     pago = models.ForeignKey(Document, on_delete=models.CASCADE,
-                             related_name='monitor_pago',
-                             null=True, blank=True)
+                             related_name='monitor_pago')
