@@ -52,7 +52,7 @@ class Participantes(InscriptionBase):
     image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10)
-    medicines = models.TextField()
+    medicines = models.TextField(blank=True, null=True)
     pago = models.ForeignKey(Document, on_delete=models.CASCADE,
                              related_name='pago')
 
@@ -85,7 +85,7 @@ class Lider(Colaborador):
     image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10)
-    medicines = models.TextField()
+    medicines = models.TextField(blank=True, null=True)
 
 
 class Monitor(Colaborador):
@@ -97,6 +97,6 @@ class Monitor(Colaborador):
     image_authorization = models.BooleanField(default=False)
     emergency_phone = models.CharField(max_length=20)
     t_shirt_size = models.CharField(max_length=10)
-    medicines = models.TextField()
+    medicines = models.TextField(blank=True, null=True)
     pago = models.ForeignKey(Document, on_delete=models.CASCADE,
                              related_name='monitor_pago')
