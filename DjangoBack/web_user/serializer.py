@@ -15,9 +15,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         return value
 
     def validate_phone(self, value):
-        if not re.match(r'^\+?[0-9]+$', value):
+        if not re.match(r'^\+?[1-9]\d{1,14}$', value):
             raise serializers.ValidationError(
-                "El teléfono solo puede contener números y puede comenzar con '+'.")
+                "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
 
 

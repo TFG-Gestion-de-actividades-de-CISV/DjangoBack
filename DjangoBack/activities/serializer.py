@@ -28,9 +28,9 @@ class NinosSerializer(serializers.ModelSerializer):
                   'pago', 'status']
 
     def validate_emergency_phone(self, value):
-        if not re.match(r'^\+?[0-9]+$', value):
+        if not re.match(r'^\+?[1-9]\d{1,14}$', value):
             raise serializers.ValidationError(
-                "El teléfono solo puede contener números y puede comenzar con '+'.")
+                "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
 
     def create(self, validated_data):
@@ -72,9 +72,9 @@ class MayoresSerializer(serializers.ModelSerializer):
                   'health_card', 'pago', 'status']
 
     def validate_emergency_phone(self, value):
-        if not re.match(r'^\+?[0-9]+$', value):
+        if not re.match(r'^\+?[1-9]\d{1,14}$', value):
             raise serializers.ValidationError(
-                "El teléfono solo puede contener números y puede comenzar con '+'.")
+                "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
 
     def create(self, validated_data):
@@ -121,10 +121,18 @@ class LiderSerializer(serializers.ModelSerializer):
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
                   "cisv_safeguarding", "health_card", 'status']
 
-    def validate_emergency_phone(self, value):
-        if not re.match(r'^\+?[0-9]+$', value):
+    def validate_dni(self, value):
+        if not re.match(r'^\d{8}[A-Z]$', value) and not re.match(r'^[XYZ]\d{7}[A-Z]$', value):
             raise serializers.ValidationError(
-                "El teléfono solo puede contener números y puede comenzar con '+'.")
+            "El DNI/NIE no tiene un formato válido. Debe ser 8 dígitos seguidos de una letra (DNI) o una letra (X, Y, Z) seguida de 7 dígitos y una letra (NIE)."   
+            )     
+        return value
+
+
+    def validate_emergency_phone(self, value):
+        if not re.match(r'^\+?[1-9]\d{1,14}$', value):
+            raise serializers.ValidationError(
+                "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
 
     def create(self, validated_data):
@@ -189,9 +197,9 @@ class MonitorSerializer(serializers.ModelSerializer):
                   "criminal_offenses_certificate", "cisv_safeguarding", "health_card", "pago"]
 
     def validate_emergency_phone(self, value):
-        if not re.match(r'^\+?[0-9]+$', value):
+        if not re.match(r'^\+?[1-9]\d{1,14}$', value):
             raise serializers.ValidationError(
-                "El teléfono solo puede contener números y puede comenzar con '+'.")
+                "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
 
     def create(self, validated_data):
