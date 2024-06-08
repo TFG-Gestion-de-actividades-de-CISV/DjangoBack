@@ -9,15 +9,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_postal_code(self, value):
-        if not value.isdigit():
+        if not value.isdigit() or len(value) != 5:
             raise serializers.ValidationError(
-                "El código postal solo puede contener números.")
+                "El código postal debe contener 5 números.")
         return value
 
     def validate_phone(self, value):
-        if not re.match(r'^\+?[0-9]+$', value):
+        if not re.match(r'^\+?[1-9]\d{1,14}$', value):
             raise serializers.ValidationError(
-                "El teléfono solo puede contener números y puede comenzar con '+'.")
+                "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
 
 
