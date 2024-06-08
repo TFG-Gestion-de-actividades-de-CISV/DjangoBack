@@ -23,7 +23,7 @@ def create_activity(request):
     if serializer.is_valid():
         serializer.save()
         return Response({'status': 'success'}, status=status.HTTP_201_CREATED)
-    return Response({"Error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -165,7 +165,7 @@ def mayores_inscription(request):
         if last_inscription is None:
             return Response({"error": "Comprobante de Pago es obligatorio"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-                data["pago"] = last_inscription.pago.id
+            data["pago"] = last_inscription.pago.id
     else:
         pago_instance = Document.objects.create(upload=pago)
         data["pago"] = pago_instance.id

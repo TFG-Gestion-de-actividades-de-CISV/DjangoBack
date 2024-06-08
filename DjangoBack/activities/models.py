@@ -22,6 +22,8 @@ class Activity(models.Model):
     price = models.CharField(max_length=254)
     packing_list = models.TextField()
     family_reunion = models.TextField()
+    there_are_meting = models.BooleanField(default=False)
+
 
 
 class InscriptionBase(models.Model):
@@ -75,7 +77,7 @@ class Colaborador(InscriptionBase):
 class Lider(Colaborador):
     dni = models.CharField(max_length=9)
     profession = models. CharField(max_length=100)
-    languages = models.CharField(max_length=100)
+    languages = models.TextField()
     first_aid = models.BooleanField(default=False)
 
     health_card = models.ForeignKey(Document, on_delete=models.CASCADE,

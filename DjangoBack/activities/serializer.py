@@ -8,6 +8,17 @@ class ActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = '__all__'
 
+    def validate(self, data):
+        if data['date_start'] > data['date_end']:
+            raise serializers.ValidationError("La fecha de inicio no puede ser posterior a la fecha de finalización.")
+        return data
+    
+    def validate_price(self, value):
+        try:
+            float(value)
+        except ValueError:
+            raise serializers.ValidationError("El precio debe ser un número válido.")
+        return value
 
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
