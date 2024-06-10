@@ -356,7 +356,7 @@ def all_inscriptions(request, activity):
     if not user.is_admin:
         return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
     
-    inscription = InscriptionBase.objects.filter(activity = activity)
+    inscription = InscriptionBase.objects.filter(activity = activity).order_by('status')
     serializer = InscripcionSerializer(inscription, many = True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -408,3 +408,43 @@ def get_inscription(request, activity, user_email, role):
 
     else:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+@api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
+def accept_inscription(request, inscription_id):
+    if not request.user.is_authenticated:
+         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    if not request.user.is_admin:
+        return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        inscription = InscriptionBase.objects.get(id=inscription_id)
+        if inscription.status != 0:
+            return  Response({"error": "La inscripción ya ha sido procesada."}, status=status.HTTP_400_BAD_REQUEST)
+        inscription.status = 1
+        inscription.save()
+        return Response({'status': 'success'}, status=status.HTTP_200_OK)
+    except InscriptionBase.DoesNotExist:
+        return Response({"error": "Inscripción no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+@api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
+def reject_inscription(request, inscription_id):
+    if not request.user.is_authenticated:
+         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    if not request.user.is_admin:
+        return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        inscription = InscriptionBase.objects.get(id=inscription_id)
+        if inscription.status != 0:
+            return  Response({"error": "La inscripción ya ha sido procesada."}, status=status.HTTP_400_BAD_REQUEST)
+        inscription.status = 2
+        inscription.save()
+        return Response({'status': 'success'}, status=status.HTTP_200_OK)
+    except InscriptionBase.DoesNotExist:
+        return Response({"error": "Inscripción no encontrada"}, status=status.HTTP_404_NOT_FOUND)

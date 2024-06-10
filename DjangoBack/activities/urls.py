@@ -11,7 +11,10 @@ urlpatterns = [
     path("get_or_create_inscription/<str:role>",
          views.get_or_create_inscription),
     path("all_inscriptions/<int:activity>", views.all_inscriptions),
-    path("get_inscription/<int:activity>/<str:user_email>/<str:role>", views.get_inscription)
+    path("get_inscription/<int:activity>/<str:user_email>/<str:role>", views.get_inscription),
+    path('accept_inscription/<int:inscription_id>/', views.accept_inscription, name='accept_inscription'),
+    path('reject_inscription/<int:inscription_id>/', views.reject_inscription, name='reject_inscription'),
+
 
 
 ]

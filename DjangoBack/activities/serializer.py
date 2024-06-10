@@ -57,7 +57,7 @@ class NinosGetSerializer(serializers.ModelSerializer):
         model = Nino
         fields = ["allergy", 'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines', 'health_card',
-                  'pago']
+                  'pago', 'id', 'status']
 
     def get_health_card(self, obj):
         if obj.health_card:
@@ -100,7 +100,7 @@ class MayoresGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mayor
         fields = ["allergy", 'image_authorization', 'emergency_phone',
-                  't_shirt_size', 'medicines', 'health_card', 'pago']
+                  't_shirt_size', 'medicines', 'health_card', 'pago', 'id', 'status']
 
     def get_health_card(self, obj):
         if obj.health_card:
@@ -164,7 +164,7 @@ class LiderGetSerializer(serializers.ModelSerializer):
                   "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
-                  "cisv_safeguarding", "health_card"]
+                  "cisv_safeguarding", "health_card", 'id', 'status']
 
     def get_sexual_crimes_certificate(self, obj):
         if obj.sexual_crimes_certificate:
@@ -231,7 +231,7 @@ class MonitorGetSerializer(serializers.ModelSerializer):
                   "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
-                  "cisv_safeguarding", "health_card", "pago"]
+                  "cisv_safeguarding", "health_card", "pago", 'id', 'status']
 
     def get_sexual_crimes_certificate(self, obj):
         if obj.sexual_crimes_certificate:
