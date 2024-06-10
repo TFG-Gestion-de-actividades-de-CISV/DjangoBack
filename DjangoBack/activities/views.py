@@ -448,3 +448,16 @@ def reject_inscription(request, inscription_id):
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
     except InscriptionBase.DoesNotExist:
         return Response({"error": "Inscripción no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(["GET"])
+@authentication_classes([CookieTokenAuthentication])
+def user_inscriptions(request):
+     
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+    user = request.user
+    inscriptions = InscriptionBase.objects.filter(user=user)
+    serializer = InscripcionSerializer(inscriptions, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)

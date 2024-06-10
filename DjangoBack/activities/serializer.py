@@ -265,10 +265,12 @@ class InscripcionSerializer(serializers.ModelSerializer):
     user_surnames = serializers.SerializerMethodField()
     user_email = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    activity_name = serializers.SerializerMethodField()
+
 
     class Meta:
         model = InscriptionBase
-        fields = ["rol", "status", "user_name", "user_surnames", "id", "user_email"]
+        fields = ["rol", "status", "user_name", "user_surnames", "id", "user_email", "activity_name"]
     
     def get_user_name(self, obj):
         return obj.user.profile.name if obj.user.profile else None
@@ -283,6 +285,8 @@ class InscripcionSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return obj.get_status_display()
     
+    def get_activity_name(self, obj):
+        return obj.activity.name
 
 class AllNinosFieldsSerializer(NinosGetSerializer):
 
