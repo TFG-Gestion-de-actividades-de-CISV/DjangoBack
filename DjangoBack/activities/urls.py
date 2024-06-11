@@ -17,6 +17,7 @@ urlpatterns = [
     path('user_inscriptions', views.user_inscriptions, name='user_inscriptions'),
     path("update_activity/<int:activity_id>/", views.update_activity, name="update_activity"),
     path("get_activity/<int:activity_id>/", views.get_activity, name="get_activity"),
+    path("delete_activity/<int:activity_id>/", views.delete_activity, name="delete_activity"),
 
 
 ]
