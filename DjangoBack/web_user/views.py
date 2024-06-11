@@ -38,8 +38,12 @@ def register(request):
 
 @api_view(['POST'])
 def login(request):
-    user = get_object_or_404(User, email=request.data["email"])
 
+    if Web_User_Pending.objects.filter(email=request.data["email"]).exists():
+        return Response({"error": "La petición de registro aun no ha sido evaluada"}, status=status.HTTP_403_FORBIDDEN)
+
+
+    user = get_object_or_404(User, email=request.data["email"])
     if not user.check_password(request.data["password"]):
         return JsonResponse({"error": "Invalid password"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -149,13 +153,15 @@ def acept_request(request):
 
 
 @api_view(["POST"])
+@authentication_classes([CookieTokenAuthentication])
 def change_password(request):
 
-    user = User.objects.filter(email=request.data["email"]).first()
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+    
+    user = request.user
 
-    if not user:
-        return Response({"error": "Usaurio con este email no existe"}, status=status.HTTP_404_NOT_FOUND)
-
+   
     if not check_password(request.data["password_old"], user.password):
         return Response({"error": "Contraseña actual incorrecta"}, status=status.HTTP_400_BAD_REQUEST)
 

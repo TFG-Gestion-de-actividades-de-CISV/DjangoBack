@@ -25,6 +25,42 @@ def create_activity(request):
         return Response({'status': 'success'}, status=status.HTTP_201_CREATED)
     return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["PUT"])
+@authentication_classes([CookieTokenAuthentication])
+def update_activity(request, activity_id):
+
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+
+    if not request.user.is_admin:
+        return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        activity = Activity.objects.get(id=activity_id)
+    except Activity.DoesNotExist:
+        return Response({"error": "Actividad no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer  = ActivitySerializer(activity, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({"error": serializer.errors}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(["GET"])
+@authentication_classes([CookieTokenAuthentication])
+def get_activity(request, activity_id):
+
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        activity = Activity.objects.get(id=activity_id)
+    except Activity.DoesNotExist:
+        return Response({"error": "Actividad no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+   
+    serializer  = ActivitySerializer(activity)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
 @authentication_classes([CookieTokenAuthentication])
