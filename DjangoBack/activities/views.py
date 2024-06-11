@@ -5,6 +5,7 @@ from .serializer import *
 from rest_framework import status
 from web_user.authentication import CookieTokenAuthentication
 from .models import *
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
@@ -61,6 +62,41 @@ def get_activity(request, activity_id):
     serializer  = ActivitySerializer(activity)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(["DELETE"])
+@authentication_classes([CookieTokenAuthentication])
+def delete_activity(request, activity_id):
+    if not request.user.is_authenticated:
+        return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
+
+    if not request.user.is_admin:
+        return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
+
+    activity = get_object_or_404(Activity, id=activity_id)
+    inscriptions = InscriptionBase.objects.filter(activity=activity)
+
+    users_roles_last_inscriptions = {}
+    for inscription in InscriptionBase.objects.all():
+        key = (inscription.user_id, inscription.rol)
+        users_roles_last_inscriptions[key] = max(
+            users_roles_last_inscriptions.get(key, inscription), inscription,
+            key=lambda x: x.id
+        )
+
+    for inscription in inscriptions:
+        key = (inscription.user_id, inscription.rol)
+        if inscription == users_roles_last_inscriptions[key]:
+            inscription.visible = False  # Marcar como no visible
+            inscription.save()
+        else:
+            inscription.delete()
+
+    # Eliminar la actividad
+    activity.delete()
+
+    return Response({'message': 'Actividad eliminada exitosamente'}, status=status.HTTP_200_OK)
+
+
 
 @api_view(["GET"])
 @authentication_classes([CookieTokenAuthentication])
@@ -392,7 +428,7 @@ def all_inscriptions(request, activity):
     if not user.is_admin:
         return Response({"error": "No es admin"}, status=status.HTTP_403_FORBIDDEN)
     
-    inscription = InscriptionBase.objects.filter(activity = activity).order_by('status')
+    inscription = InscriptionBase.objects.filter(activity = activity, visible = True).order_by('status')
     serializer = InscripcionSerializer(inscription, many = True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -493,7 +529,7 @@ def user_inscriptions(request):
         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
     
     user = request.user
-    inscriptions = InscriptionBase.objects.filter(user=user)
+    inscriptions = InscriptionBase.objects.filter(user=user, visible=True)
     serializer = InscripcionSerializer(inscriptions, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
