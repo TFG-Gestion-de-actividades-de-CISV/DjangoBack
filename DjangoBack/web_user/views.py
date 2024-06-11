@@ -38,8 +38,12 @@ def register(request):
 
 @api_view(['POST'])
 def login(request):
-    user = get_object_or_404(User, email=request.data["email"])
 
+    if Web_User_Pending.objects.filter(email=request.data["email"]).exists():
+        return Response({"error": "La petición de registro aun no ha sido evaluada"}, status=status.HTTP_403_FORBIDDEN)
+
+
+    user = get_object_or_404(User, email=request.data["email"])
     if not user.check_password(request.data["password"]):
         return JsonResponse({"error": "Invalid password"}, status=status.HTTP_404_NOT_FOUND)
 
