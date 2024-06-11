@@ -15,7 +15,8 @@ urlpatterns = [
     path('accept_inscription/<int:inscription_id>/', views.accept_inscription, name='accept_inscription'),
     path('reject_inscription/<int:inscription_id>/', views.reject_inscription, name='reject_inscription'),
     path('user_inscriptions', views.user_inscriptions, name='user_inscriptions'),
-
+    path("update_activity/<int:activity_id>/", views.update_activity, name="update_activity"),
+    path("get_activity/<int:activity_id>/", views.get_activity, name="get_activity"),
 
 
 ]
