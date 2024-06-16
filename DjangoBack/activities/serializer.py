@@ -296,10 +296,18 @@ class AllNinosFieldsSerializer(NinosGetSerializer):
     user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
     user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
     user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    family_members_emails = serializers.SerializerMethodField()
+
     class Meta:
         model = Nino
         fields = NinosGetSerializer.Meta.fields + ["user_name", "user_surnames",
-                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+                            "user_city" , "user_postal_code", "user_phone", 
+                            "user_birthdate", "family_members_emails"]
+        
+
+    def get_family_members_emails(self, obj):
+        family_members = User.objects.filter(family=obj.user.family)
+        return [member.email for member in family_members]
 
     
 

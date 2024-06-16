@@ -137,12 +137,22 @@ def acept_request(request):
             birthdate=web_user_pending.profile.birthdate
         )
 
+
         # Creamos nuevo user
         new_user = User.objects.create_user(
             email=email,
             profile=new_profile,
             password=None
         )
+        # Añadir a la familia
+        family_member_email = web_user_pending.family_member_email
+        if family_member_email:
+            family_member = User.objects.get(email=family_member_email)
+            new_user.family = family_member.family
+        if not new_user.family:
+            new_user.family = Family.objects.create()
+        
+    
         new_user.password = web_user_pending.password
         new_user.save()
 
