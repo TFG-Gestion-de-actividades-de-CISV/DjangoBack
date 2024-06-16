@@ -148,3 +148,19 @@ class Monitor(Colaborador):
             self.pago.delete()
 
         super(Monitor, self).delete(*args, **kwargs)
+
+class Parent(Colaborador):
+    profession = models. CharField(max_length=100)
+    pago = models.ForeignKey(Document, on_delete=models.SET_NULL, null=True,
+                             related_name='parent_pago')
+    image_authorization = models.BooleanField(default=False)
+
+    
+    def delete(self, *args, **kwargs):
+
+
+        otros_parent_pago = Parent.objects.exclude(id=self.id).filter(pago=self.pago)
+        if not otros_parent_pago.exists():
+            self.pago.delete()
+
+        super(Parent, self).delete(*args, **kwargs)
