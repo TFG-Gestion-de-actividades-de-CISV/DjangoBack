@@ -1,6 +1,6 @@
 from rest_framework import serializers
 import re
-from .models import Web_User_Pending, Profile, User
+from .models import Web_User_Pending, Profile, User, Family
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -19,19 +19,25 @@ class ProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "El teléfono debe estar en formato internacional. Solo puede contener números y, opcionalmente, un símbolo '+' al principio.")
         return value
-
+    
 
 class Web_User_Pending_Serializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
 
     class Meta:
         model = Web_User_Pending
-        fields = ['email', 'password', 'is_admin', 'profile']
+        fields = ['email', 'password', 'is_admin', 'profile', 'family_member_email']
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError(
                 "El usuario con este email ya existe")
+        return value
+    
+    def validate_family_member_email(self, value):
+        if value and not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                "No existe un usuario con este email")
         return value
 
     def create(self, validated_data):

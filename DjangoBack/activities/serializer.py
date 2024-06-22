@@ -57,7 +57,7 @@ class NinosGetSerializer(serializers.ModelSerializer):
         model = Nino
         fields = ["allergy", 'image_authorization', 'emergency_phone',
                   't_shirt_size', 'medicines', 'health_card',
-                  'pago']
+                  'pago', 'id', 'status']
 
     def get_health_card(self, obj):
         if obj.health_card:
@@ -100,7 +100,7 @@ class MayoresGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mayor
         fields = ["allergy", 'image_authorization', 'emergency_phone',
-                  't_shirt_size', 'medicines', 'health_card', 'pago']
+                  't_shirt_size', 'medicines', 'health_card', 'pago', 'id', 'status']
 
     def get_health_card(self, obj):
         if obj.health_card:
@@ -164,7 +164,7 @@ class LiderGetSerializer(serializers.ModelSerializer):
                   "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
-                  "cisv_safeguarding", "health_card"]
+                  "cisv_safeguarding", "health_card", 'id', 'status']
 
     def get_sexual_crimes_certificate(self, obj):
         if obj.sexual_crimes_certificate:
@@ -231,7 +231,7 @@ class MonitorGetSerializer(serializers.ModelSerializer):
                   "image_authorization", "emergency_phone",
                   "t_shirt_size", "medicines",
                   "sexual_crimes_certificate", "criminal_offenses_certificate",
-                  "cisv_safeguarding", "health_card", "pago"]
+                  "cisv_safeguarding", "health_card", "pago", 'id', 'status']
 
     def get_sexual_crimes_certificate(self, obj):
         if obj.sexual_crimes_certificate:
@@ -259,16 +259,80 @@ class MonitorGetSerializer(serializers.ModelSerializer):
         return None
 
 
+class ParentSerializer(serializers.ModelSerializer):
+    sexual_crimes_certificate = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.all())
+    criminal_offenses_certificate = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.all())
+    cisv_safeguarding = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.all())
+    pago = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.all())
+
+    class Meta:
+        model = Parent
+        fields = ["user", "activity", "rol",  "allergy",
+                  "profession", 
+                  "image_authorization",
+                  "sexual_crimes_certificate", "criminal_offenses_certificate",
+                  "cisv_safeguarding", "pago", 'status']
+
+
+
+    def create(self, validated_data):
+        parent_instance = Parent.objects.create(**validated_data)
+        return parent_instance
+
+
+class ParentGetSerializer(serializers.ModelSerializer):
+    sexual_crimes_certificate = serializers.SerializerMethodField()
+    criminal_offenses_certificate = serializers.SerializerMethodField()
+    cisv_safeguarding = serializers.SerializerMethodField()
+    pago = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Parent
+        fields = ["profession", "allergy",
+                  "image_authorization",
+                  "sexual_crimes_certificate", "criminal_offenses_certificate",
+                  "cisv_safeguarding", "pago", 'id', 'status']
+        
+
+
+    def get_sexual_crimes_certificate(self, obj):
+        if obj.sexual_crimes_certificate:
+            return self.context['request'].build_absolute_uri(obj.sexual_crimes_certificate.upload.url)
+        return None
+
+    def get_criminal_offenses_certificate(self, obj):
+        if obj.criminal_offenses_certificate:
+            return self.context['request'].build_absolute_uri(obj.criminal_offenses_certificate.upload.url)
+        return None
+
+    def get_cisv_safeguarding(self, obj):
+        if obj.cisv_safeguarding:
+            return self.context['request'].build_absolute_uri(obj.cisv_safeguarding.upload.url)
+        return None
+
+    def get_pago(self, obj):
+        if obj.pago:
+            return self.context['request'].build_absolute_uri(obj.pago.upload.url)
+        return None
+
+
+
 class InscripcionSerializer(serializers.ModelSerializer):
     
     user_name = serializers.SerializerMethodField()
     user_surnames = serializers.SerializerMethodField()
     user_email = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    activity_name = serializers.SerializerMethodField()
+
 
     class Meta:
         model = InscriptionBase
-        fields = ["rol", "status", "user_name", "user_surnames", "id", "user_email"]
+        fields = ["rol", "status", "user_name", "user_surnames", "id", "user_email", "activity_name"]
     
     def get_user_name(self, obj):
         return obj.user.profile.name if obj.user.profile else None
@@ -283,6 +347,8 @@ class InscripcionSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return obj.get_status_display()
     
+    def get_activity_name(self, obj):
+        return obj.activity.name
 
 class AllNinosFieldsSerializer(NinosGetSerializer):
 
@@ -292,10 +358,18 @@ class AllNinosFieldsSerializer(NinosGetSerializer):
     user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
     user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
     user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    family_members_emails = serializers.SerializerMethodField()
+
     class Meta:
         model = Nino
         fields = NinosGetSerializer.Meta.fields + ["user_name", "user_surnames",
-                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+                            "user_city" , "user_postal_code", "user_phone", 
+                            "user_birthdate", "family_members_emails"]
+        
+
+    def get_family_members_emails(self, obj):
+        family_members = User.objects.filter(family=obj.user.family)
+        return [member.email for member in family_members]
 
     
 
@@ -307,10 +381,17 @@ class AllMayoresFieldsSerializer(MayoresGetSerializer):
     user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
     user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
     user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    family_members_emails = serializers.SerializerMethodField()
+
     class Meta:
         model = Mayor
         fields = MayoresGetSerializer.Meta.fields + ["user_name", "user_surnames",
-                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate","family_members_emails"]
+
+    def get_family_members_emails(self, obj):
+        family_members = User.objects.filter(family=obj.user.family)
+        return [member.email for member in family_members]
+
 
     
 class AllLiderFieldsSerializer(LiderGetSerializer):
@@ -321,10 +402,15 @@ class AllLiderFieldsSerializer(LiderGetSerializer):
     user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
     user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
     user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    family_members_emails = serializers.SerializerMethodField()
+
     class Meta:
         model = Lider
         fields = LiderGetSerializer.Meta.fields + ["user_name", "user_surnames",
-                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate", "family_members_emails"]
+    def get_family_members_emails(self, obj):
+        family_members = User.objects.filter(family=obj.user.family)
+        return [member.email for member in family_members]
 
     
 class AllMonitorFieldsSerializer(MonitorGetSerializer):
@@ -335,9 +421,33 @@ class AllMonitorFieldsSerializer(MonitorGetSerializer):
     user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
     user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
     user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    family_members_emails = serializers.SerializerMethodField()
+
     class Meta:
         model = Monitor 
         fields = MonitorGetSerializer.Meta.fields + ["user_name", "user_surnames",
-                            "user_city" , "user_postal_code", "user_phone", "user_birthdate"]
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate", "family_members_emails"]
 
+    def get_family_members_emails(self, obj):
+        family_members = User.objects.filter(family=obj.user.family)
+        return [member.email for member in family_members]
     
+
+class AllParentFieldsSerializer(ParentGetSerializer):
+    
+    user_name = serializers.CharField(source='user.profile.name', read_only=True)
+    user_surnames = serializers.CharField(source='user.profile.surnames', read_only=True)
+    user_city = serializers.CharField(source='user.profile.city', read_only=True)
+    user_postal_code = serializers.CharField(source='user.profile.postal_code', read_only=True)
+    user_phone = serializers.CharField(source='user.profile.phone', read_only=True)
+    user_birthdate = serializers.DateField(source='user.profile.birthdate', read_only=True)
+    family_members_emails = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Parent 
+        fields = ParentGetSerializer.Meta.fields + ["user_name", "user_surnames",
+                            "user_city" , "user_postal_code", "user_phone", "user_birthdate", "family_members_emails"]
+
+    def get_family_members_emails(self, obj):
+        family_members = User.objects.filter(family=obj.user.family)
+        return [member.email for member in family_members]
