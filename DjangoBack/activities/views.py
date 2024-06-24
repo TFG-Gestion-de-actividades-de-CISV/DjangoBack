@@ -529,7 +529,6 @@ inscriptions_dict = {
 @authentication_classes([CookieTokenAuthentication])
 def get_inscription(request, activity, user_email, role):
 
-    print("ento")
 
     if not request.user.is_authenticated:
         return Response({"error": "NO autenticado"}, status=status.HTTP_403_FORBIDDEN)
@@ -547,13 +546,11 @@ def get_inscription(request, activity, user_email, role):
 
     inscription = model_class.objects.get(user=user, activity = activity_instance)
 
-    print("salgo")
 
 
     if inscription:
         serializer_class = inscriptions_dict.get(role)
         if serializer_class:
-            print(serializer_class)
             serializer = serializer_class(
                 inscription, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
