@@ -105,6 +105,18 @@ class InscriptionTestCase(APITestCase):
             there_are_meting=False
         )
 
+        self.activity_second = Activity.objects.create(
+            name='Second Activity', 
+            adress='Second Address', 
+            date_start='2023-01-01', 
+            date_end='2023-01-02', 
+            hours_start='10:00', 
+            price='100', 
+            packing_list='Second Test Packing List', 
+            family_reunion='Second Test Family Reunion', 
+            there_are_meting=True
+        )
+
         # Crear archivos simulados para los documentos
         health_card_content = b'health card content'
         self.health_card = SimpleUploadedFile('health_card.txt', health_card_content, content_type='text/plain')
@@ -154,7 +166,7 @@ class InscriptionTestCase(APITestCase):
         url = reverse('mayores_inscription')
         self.client.cookies['token'] = self.user_token.key
         data = {
-            'activity': self.activity.id,
+            'activity': self.activity_second.id,
             'rol': 'mayores',
             'image_authorization': True,
             'emergency_phone': '+123456789',
@@ -168,7 +180,7 @@ class InscriptionTestCase(APITestCase):
         self.assertEqual(Mayor.objects.count(), 1)
         mayor = Mayor.objects.get()
         self.assertEqual(mayor.user, self.user)
-        self.assertEqual(mayor.activity, self.activity)
+        self.assertEqual(mayor.activity, self.activity_second)
         
 
     def test_lider_inscription(self):
@@ -228,7 +240,7 @@ class InscriptionTestCase(APITestCase):
         url = reverse('parent_inscription')
         self.client.cookies['token'] = self.user_token.key
         data = {
-            'activity': self.activity.id,
+            'activity': self.activity_second.id,
             'sexual_crimes_certificate': self.health_card,
             'profession': 'doctor',
             'criminal_offenses_certificate': self.criminal_offenses_certificate,
@@ -241,8 +253,65 @@ class InscriptionTestCase(APITestCase):
         self.assertEqual(Parent.objects.count(), 1)
         parent = Parent.objects.get()
         self.assertEqual(parent.user, self.user)
-        self.assertEqual(parent.activity, self.activity)
+        self.assertEqual(parent.activity, self.activity_second)
+
+
+    def test_get_inscription(self):
+        self.test_ninos_inscription()  # Crear una inscripción primero
+        url = reverse('get_inscription', args=[self.activity.id, self.user.email, 'ninos'])
+        self.client.cookies['token'] = self.token.key
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['emergency_phone'], '+123456789')
+        self.assertEqual(response.data['t_shirt_size'], 'M')
 
 
 
-    
+    def test_accept_inscription(self):
+        # Primero crear una inscripción
+        self.test_ninos_inscription()
+        nino = Nino.objects.get()
+        url = reverse('accept_inscription', args=[nino.id])
+        self.client.cookies['token'] = self.token.key
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        nino.refresh_from_db()
+        self.assertEqual(nino.status, 1) 
+
+    def test_reject_inscription(self):
+        # Primero crear una inscripción
+        self.test_ninos_inscription()
+        nino = Nino.objects.get()
+        url = reverse('reject_inscription', args=[nino.id])
+        self.client.cookies['token'] = self.token.key
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        nino.refresh_from_db()
+        self.assertEqual(nino.status, 2)
+
+    def test_all_inscriptions(self):
+        # Crear algunas inscripciones
+        self.test_ninos_inscription()
+        self.test_mayores_inscription()
+
+        url = reverse('all_inscriptions',  args=[self.activity.id])
+        self.client.cookies['token'] = self.token.key  
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        inscriptions = response.data
+        self.assertEqual(len(inscriptions), 1)
+
+
+    def test_user_inscriptions(self):
+        # Crear algunas inscripciones
+
+        self.test_ninos_inscription()
+        self.test_mayores_inscription()
+
+        url = reverse('user_inscriptions')
+        self.client.cookies['token'] = self.user_token.key  
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        inscriptions = response.data
+        self.assertEqual(len(inscriptions), 2)
